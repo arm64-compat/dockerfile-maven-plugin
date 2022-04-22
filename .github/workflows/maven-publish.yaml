@@ -6,7 +6,7 @@ name: Maven Package
 on: push
 
 env:
-  MAVEN_REPOSITORY: github::https://maven.pkg.github.com/${{ github.event.repository.name }}
+  MAVEN_REPOSITORY: github::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
 
 jobs:
   build-docker-client:
@@ -47,4 +47,4 @@ jobs:
     - name: Publish to GitHub Packages Apache Maven
       run: >
         mvn deploy --file pom.xml $GITHUB_WORKSPACE/settings.xml
-        -DaltSnapshotDeploymentRepository=$MAVEN_REPOSITORY
+        -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
