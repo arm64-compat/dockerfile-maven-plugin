@@ -5,16 +5,16 @@ name: Maven Package
 
 on: push
 
-env:
-  MAVEN_REPOSITORY: github::https://maven.pkg.github.com/${GITHUB_REPOSITORY}
-
 jobs:
   build-docker-client:
+    defaults:
+      run:
+        working-directory: docker-client
 
     runs-on: ubuntu-latest
     env:
-      POM_LOCATION: docker-client/pom.xml
       GITHUB_TOKEN: ${{ github.token }}
+      MAVEN_REPOSITORY: github::https://maven.pkg.github.com/${GITHUB_REPOSITORY}
     permissions:
       contents: read
       packages: write
@@ -27,7 +27,7 @@ jobs:
       uses: actions/cache@v3.0.2
       with:
         path: ~/.m2
-        key: maven-${{ hashFiles('$POM_LOCATION') }}
+        key: maven-${{ hashFiles('pom.xml') }}
     - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
@@ -38,11 +38,11 @@ jobs:
     - name: Change jnr-unixsocket version
       run: >
         mvn versions:use-latest-releases
-        --file $POM_LOCATION
+        --file pom.xml
         -Dincludes=com.github.jnr:jnr-unixsocket
     - name: Build docker-client snapshot
-      run: mvn -B package --file $POM_LOCATION -DskipTests
+      run: mvn -B package --file pom.xml -DskipTests
     - name: Publish to GitHub Packages Apache Maven
       run: >
-        mvn deploy --file $POM_LOCATION $GITHUB_WORKSPACE/settings.xml
+        mvn deploy --file pom.xml $GITHUB_WORKSPACE/settings.xml
         -DaltSnapshotDeploymentRepository=$MAVEN_REPOSITORY
