@@ -5,8 +5,15 @@ name: Maven Package
 
 on: push
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   MAVEN_REPOSITORY: github::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
+  GITHUB_TOKEN: ${{ github.token }}
+  MVN: mvn -DskipTests -s ${{ github.workspace }}/settings.xml
+
 
 jobs:
   build-docker-client:
@@ -15,11 +22,6 @@ jobs:
         working-directory: docker-client
 
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
-    permissions:
-      contents: read
-      packages: write
 
     steps:
     - uses: actions/checkout@v3
@@ -38,13 +40,8 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Change jnr-unixsocket version
-      run: >
-        mvn versions:use-latest-releases
-        --file pom.xml
-        -Dincludes=com.github.jnr:jnr-unixsocket
+      run: $MVN versions:use-latest-releases -Dincludes=com.github.jnr:jnr-unixsocket
     - name: Build docker-client snapshot
-      run: mvn -B package --file pom.xml -DskipTests
+      run: $MVN -B package
     - name: Publish to GitHub Packages Apache Maven
-      run: >
-        mvn deploy --file pom.xml -s $GITHUB_WORKSPACE/settings.xml
-        -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
+      run: $MVN deploy -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
