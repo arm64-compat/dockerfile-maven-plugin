@@ -13,6 +13,7 @@ env:
   MAVEN_REPOSITORY: github::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
   GITHUB_TOKEN: ${{ github.token }}
   MVN: mvn -B -DskipTests -s ${{ github.workspace }}/settings.xml
+  DEPLOY_GOAL: org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy
 
 
 jobs:
@@ -42,4 +43,4 @@ jobs:
     - name: Change jnr-unixsocket version
       run: $MVN versions:use-latest-releases -Dincludes=com.github.jnr:jnr-unixsocket
     - name: Build / Publish to GitHub Packages Apache Maven
-      run: $MVN deploy -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
+      run: $MVN package $DEPLOY_GOAL -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
