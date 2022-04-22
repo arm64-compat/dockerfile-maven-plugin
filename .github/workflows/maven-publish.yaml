@@ -12,7 +12,7 @@ permissions:
 env:
   MAVEN_REPOSITORY: github::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
   GITHUB_TOKEN: ${{ github.token }}
-  MVN: mvn -DskipTests -s ${{ github.workspace }}/settings.xml
+  MVN: mvn -B -DskipTests -s ${{ github.workspace }}/settings.xml
 
 
 jobs:
@@ -41,7 +41,5 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Change jnr-unixsocket version
       run: $MVN versions:use-latest-releases -Dincludes=com.github.jnr:jnr-unixsocket
-    - name: Build docker-client snapshot
-      run: $MVN -B package
-    - name: Publish to GitHub Packages Apache Maven
+    - name: Build / Publish to GitHub Packages Apache Maven
       run: $MVN deploy -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
