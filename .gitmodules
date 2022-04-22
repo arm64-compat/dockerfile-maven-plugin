@@ -1,0 +1,3 @@
+[submodule "docker-client"]
+	path = docker-client
+	url = https://github.com/spotify/docker-client.git
