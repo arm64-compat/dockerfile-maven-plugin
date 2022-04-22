@@ -41,5 +41,5 @@ jobs:
       run: mvn -B package --file $POM_LOCATION -DskipTests
     - name: Publish to GitHub Packages Apache Maven
       run: >
-        mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        mvn deploy -s --file $POM_LOCATION $GITHUB_WORKSPACE/settings.xml
         -DaltSnapshotDeploymentRepository=github::https://maven.pkg.github.com/${GITHUB_REPOSITORY}
