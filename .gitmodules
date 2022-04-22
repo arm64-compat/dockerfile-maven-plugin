@@ -1,3 +1,6 @@
 [submodule "docker-client"]
 	path = docker-client
 	url = https://github.com/spotify/docker-client.git
+[submodule "dockerfile-maven"]
+	path = dockerfile-maven
+	url = https://github.com/spotify/dockerfile-maven.git
