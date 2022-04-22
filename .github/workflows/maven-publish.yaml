@@ -5,6 +5,9 @@ name: Maven Package
 
 on: push
 
+env:
+  MAVEN_REPOSITORY: github::https://maven.pkg.github.com/${{ github.event.repository.name }}
+
 jobs:
   build-docker-client:
     defaults:
@@ -14,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ github.token }}
-      MAVEN_REPOSITORY: github::https://maven.pkg.github.com/${GITHUB_REPOSITORY}
     permissions:
       contents: read
       packages: write
