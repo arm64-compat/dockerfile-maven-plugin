@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       POM_LOCATION: docker-client/pom.xml
+      GITHUB_TOKEN: ${{ github.token }}
     permissions:
       contents: read
       packages: write
@@ -28,12 +29,15 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: settings.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Change jnr-unixsocket version
-      run: mvn versions:use-latest-releases --file $POM_LOCATION -Dincludes=com.github.jnr:jnr-unixsocket
+      run: >
+        mvn versions:use-latest-releases
+        --file $POM_LOCATION
+        -Dincludes=com.github.jnr:jnr-unixsocket
     - name: Build docker-client snapshot
       run: mvn -B package --file $POM_LOCATION -DskipTests
     - name: Publish to GitHub Packages Apache Maven
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+      run: >
+        mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        -DaltSnapshotDeploymentRepository=github::https://maven.pkg.github.com/${GITHUB_REPOSITORY}
