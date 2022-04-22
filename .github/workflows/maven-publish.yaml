@@ -46,5 +46,5 @@ jobs:
       run: mvn -B package --file pom.xml -DskipTests
     - name: Publish to GitHub Packages Apache Maven
       run: >
-        mvn deploy --file pom.xml $GITHUB_WORKSPACE/settings.xml
+        mvn deploy --file pom.xml -s $GITHUB_WORKSPACE/settings.xml
         -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
