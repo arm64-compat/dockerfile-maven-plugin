@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 env:
-  MAVEN_REPOSITORY: github::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
+  MAVEN_REPOSITORY: github::default::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
   GITHUB_TOKEN: ${{ github.token }}
   MVN: mvn -B -DskipTests -s ${{ github.workspace }}/settings.xml
   DEPLOY_GOAL: org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy
