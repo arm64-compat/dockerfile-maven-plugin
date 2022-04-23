@@ -13,6 +13,7 @@ env:
   MAVEN_REPOSITORY: github::default::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
   GITHUB_TOKEN: ${{ github.token }}
   DEPLOY_GOAL: org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy
+  GITHUB_WORKSPACE: ${{ github.workspace }}
 
 
 jobs:
@@ -28,8 +29,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         submodules: true
-    - name: Cache
-      uses: actions/cache@v3.0.2
+    - uses: actions/cache@v3.0.2
       with:
         path: ~/.m2
         key: maven-${{ hashFiles('pom.xml') }}
@@ -39,12 +39,12 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        settings-path: $GITHUB_WORKSPACE # location for the settings.xml file
     - name: Change jnr-unixsocket version
       run: mvn versions:use-latest-releases -Dincludes=com.github.jnr:jnr-unixsocket
-    - name: Build / Publish to GitHub Packages Apache Maven
+    - name: Build / Publish docker-client to GitHub Packages Apache Maven
       run: >
-        mvn -B -s ${{ github.workspace }}/settings.xml -DskipTests package $DEPLOY_GOAL
+        mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests package $DEPLOY_GOAL
         -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
 
   build-maven-plugin:
@@ -69,15 +69,15 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        settings-path: $GITHUB_WORKSPACE # location for the settings.xml file
     - name: Get docker-client version
       run: |
-        export DOCKER_CLIENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f ../docker-client/pom.xml)
+        export DOCKER_CLIENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f $GITHUB_WORKSPACE/docker-client/pom.xml)
         echo "DOCKER_CLIENT_VERSION=$DOCKER_CLIENT_VERSION" >> $GITHUB_ENV
     - name: Update to docker-client snapshot
       run: >
-        mvn -s ../settings.xml versions:set-property
+        mvn versions:set-property
         -Dproperty=docker-client.version
-        -DnewVersion=${{ env.DOCKER_CLIENT_VERSION }}
+        -DnewVersion=$DOCKER_CLIENT_VERSION
     - name: Package dockerfile-maven-plugin
-      run: mvn -B -s ../settings.xml package -Dinvoker.skip -DskipTests -U
+      run: mvn -B -s $GITHUB_WORKSPACE/github-settings.xml package -Dinvoker.skip -DskipTests -U
