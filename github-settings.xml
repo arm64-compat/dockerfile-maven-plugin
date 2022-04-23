@@ -65,6 +65,6 @@ Used by Travis to deploy snapshots to Github Repository. See .travis.yml for mor
       <username>${GITHUB_USERNAME}</username>
       <password>${GITHUB_TOKEN}</password>
     </server>
-  </servers>  
+  </servers>
 
 </settings>
