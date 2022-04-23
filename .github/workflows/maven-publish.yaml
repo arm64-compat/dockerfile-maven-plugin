@@ -38,12 +38,13 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Change jnr-unixsocket version
       run: mvn versions:use-latest-releases -Dincludes=com.github.jnr:jnr-unixsocket
+    - name: Run Docker Swarm
+      run: docker swarm init
     - name: Build / Publish docker-client to GitHub Packages Apache Maven
       run: >
-        mvn -B -s $GITHUB_WORKSPACE/settings.xml package $DEPLOY_GOAL
+        mvn -B -s $GITHUB_WORKSPACE/github-settings.xml package $DEPLOY_GOAL
         -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
 
   build-maven-plugin:
@@ -71,7 +72,6 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Get docker-client version
       run: |
         export DOCKER_CLIENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f $GITHUB_WORKSPACE/docker-client/pom.xml)
