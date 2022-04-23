@@ -72,6 +72,10 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Update to docker-client snapshot
-      run: $MVN versions:update-properties -s ../settings.xml -Dincludes=com.spotify:docker-client
+      run: >
+        $MVN versions:update-properties
+        -s ../settings.xml
+        -DallowSnapshots
+        -Dincludes=com.spotify:docker-client
     - name: Package dockerfile-maven-plugin
       run: $MVN package -s ../settings.xml -Dinvoker.skip
