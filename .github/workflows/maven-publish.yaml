@@ -1,0 +1,85 @@
+# This workflow will build a package using Maven and then publish it to GitHub packages when pushed
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+
+name: Maven Package
+
+on: push
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  MAVEN_REPOSITORY: github::default::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
+  GITHUB_TOKEN: ${{ github.token }}
+  DEPLOY_GOAL: org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy
+
+
+jobs:
+  build-docker-client:
+    defaults:
+      run:
+        working-directory: docker-client
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - uses: actions/cache@v3.0.2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Set up JDK 8
+      uses: actions/setup-java@v3
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+    - name: Change jnr-unixsocket version
+      run: mvn versions:use-latest-releases -Dincludes=com.github.jnr:jnr-unixsocket
+    - name: Build / Publish docker-client to GitHub Packages Apache Maven
+      run: >
+        mvn -B -s $GITHUB_WORKSPACE/github-settings.xml -DskipTests package $DEPLOY_GOAL
+        -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
+
+  build-maven-plugin:
+    needs: build-docker-client
+
+    defaults:
+      run:
+        working-directory: dockerfile-maven
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Cache
+      uses: actions/cache@v3.0.2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Set up JDK 8
+      uses: actions/setup-java@v3
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+    - name: Get docker-client version
+      run: |
+        export DOCKER_CLIENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f $GITHUB_WORKSPACE/docker-client/pom.xml)
+        echo "DOCKER_CLIENT_VERSION=$DOCKER_CLIENT_VERSION" >> $GITHUB_ENV
+    - name: Update to docker-client snapshot
+      run: >
+        mvn versions:set-property
+        -Dproperty=docker-client.version
+        -DnewVersion=$DOCKER_CLIENT_VERSION
+    - name: Build / Test / Deploy docker-maven-plugin
+      run: >
+        mvn -s $GITHUB_WORKSPACE/github-settings.xml package $DEPLOY_GOAL
+        -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
