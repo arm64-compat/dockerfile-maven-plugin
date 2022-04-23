@@ -8,8 +8,8 @@ ARM64 build for dockerfile-maven-plugin
 Current version of dockerfile-maven-plugin doesn't support building `arm64` docker images.
 
 Reference Issues:
-https://github.com/spotify/dockerfile-maven/issues/394
-https://github.com/spotify/dockerfile-maven/issues/367
+* https://github.com/spotify/dockerfile-maven/issues/394
+* https://github.com/spotify/dockerfile-maven/issues/367
 
 The project has been marked as InActive and hence not accepting any new MRs.
 
