@@ -19,6 +19,9 @@ Used by Travis to deploy snapshots to Github Repository. See .travis.yml for mor
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
         </repository>
         <repository>
           <id>central</id>
@@ -26,6 +29,9 @@ Used by Travis to deploy snapshots to Github Repository. See .travis.yml for mor
           <snapshots>
             <enabled>false</enabled>
           </snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
         </repository>
       </repositories>
     </profile>
