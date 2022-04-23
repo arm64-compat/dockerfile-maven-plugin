@@ -14,23 +14,17 @@ Used by Travis to deploy snapshots to Github Repository. See .travis.yml for mor
       </activation>
       <repositories>
         <repository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/arm64-compat/dockerfile-maven-plugin</url>
           <snapshots>
-            <enabled>false</enabled>
+            <enabled>true</enabled>
           </snapshots>
         </repository>
         <repository>
-          <id>github</id>
-          <url>https://maven.pkg.github.com/arm64-compat/dockerfile-maven-plugin</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
           <snapshots>
-            <enabled>true</enabled>
+            <enabled>false</enabled>
           </snapshots>
         </repository>
       </repositories>

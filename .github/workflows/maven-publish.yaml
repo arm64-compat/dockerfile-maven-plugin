@@ -71,11 +71,14 @@ jobs:
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
+    - name: Get docker-client version
+      run: |
+        export DOCKER_CLIENT_VERSION=$($MVN help:evaluate Dexpression=project.version -q -DforceStdout -f ../docker-client/pom.xml)
+        echo "::set-env name=DOCKER_CLIENT_VERSION::$DOCKER_CLIENT_VERSION"
     - name: Update to docker-client snapshot
       run: >
-        $MVN versions:update-properties
-        -s ../settings.xml
-        -DallowSnapshots
-        -Dincludes=com.spotify:docker-client
+        $MVN versionsset-property -Dproperty=docker-client.version
+        -s ../settings.xml -U
+        -DnewVersion=$DOCKER_CLIENT_VERSION
     - name: Package dockerfile-maven-plugin
       run: $MVN package -s ../settings.xml -Dinvoker.skip
