@@ -13,7 +13,6 @@ env:
   MAVEN_REPOSITORY: github::default::https://maven.pkg.github.com/arm64-compat/${{ github.event.repository.name }}
   GITHUB_TOKEN: ${{ github.token }}
   DEPLOY_GOAL: org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy
-  GITHUB_WORKSPACE: ${{ github.workspace }}
 
 
 jobs:
@@ -39,7 +38,7 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: $GITHUB_WORKSPACE # location for the settings.xml file
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Change jnr-unixsocket version
       run: mvn versions:use-latest-releases -Dincludes=com.github.jnr:jnr-unixsocket
     - name: Build / Publish docker-client to GitHub Packages Apache Maven
@@ -69,7 +68,7 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: $GITHUB_WORKSPACE # location for the settings.xml file
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Get docker-client version
       run: |
         export DOCKER_CLIENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f $GITHUB_WORKSPACE/docker-client/pom.xml)
@@ -83,5 +82,5 @@ jobs:
       run: mvn -B -s $GITHUB_WORKSPACE/github-settings.xml package -Dinvoker.skip -DskipTests -U
     - name: Deploy docker-maven-plugin
       run: >
-        mvn -B -s $GITHUB_WORKSPACE/settings.xml deploy -Dinvoker.skip -DskipTests
+        mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests -Dinvoker.skip $DEPLOY_GOAL
         -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
