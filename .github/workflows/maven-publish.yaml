@@ -80,9 +80,7 @@ jobs:
         mvn versions:set-property
         -Dproperty=docker-client.version
         -DnewVersion=$DOCKER_CLIENT_VERSION
-    - name: Package dockerfile-maven-plugin
-      run: mvn -B -s $GITHUB_WORKSPACE/github-settings.xml package -Dinvoker.skip -DskipTests -U
-    - name: Deploy docker-maven-plugin
+    - name: Build / Test / Deploy docker-maven-plugin
       run: >
-        mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests -Dinvoker.skip $DEPLOY_GOAL
+        mvn -s $GITHUB_WORKSPACE/github-settings.xml package $DEPLOY_GOAL
         -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
