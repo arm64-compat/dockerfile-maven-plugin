@@ -40,11 +40,9 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
     - name: Change jnr-unixsocket version
       run: mvn versions:use-latest-releases -Dincludes=com.github.jnr:jnr-unixsocket
-    - name: Run Docker Swarm
-      run: docker swarm init
     - name: Build / Publish docker-client to GitHub Packages Apache Maven
       run: >
-        mvn -B -s $GITHUB_WORKSPACE/github-settings.xml package $DEPLOY_GOAL
+        mvn -B -s $GITHUB_WORKSPACE/github-settings.xml -DskipTests package $DEPLOY_GOAL
         -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
 
   build-maven-plugin:
