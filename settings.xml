@@ -6,18 +6,43 @@ Used by Travis to deploy snapshots to Github Repository. See .travis.yml for mor
   xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
                       http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-  <activeProfiles>
-    <activeProfile>github</activeProfile>
-  </activeProfiles>
-
   <profiles>
     <profile>
       <id>github</id>
-      <properties>
-        <altSnapshotDeploymentRepository>
-          github::https://maven.pkg.github.com/arm64-compat/dockerfile-maven-plugin
-        </altSnapshotDeploymentRepository>
-      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/arm64-compat/dockerfile-maven-plugin</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
     </profile>
   </profiles>
+
+  <servers>
+    <server>
+      <id>github</id>
+      <username>${GITHUB_USERNAME}</username>
+      <password>${GITHUB_TOKEN}</password>
+    </server>
+  </servers>  
+
 </settings>
