@@ -73,11 +73,11 @@ jobs:
     - name: Get docker-client version
       run: |
         export DOCKER_CLIENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f ../docker-client/pom.xml)
-        echo "::set-env name=DOCKER_CLIENT_VERSION::$DOCKER_CLIENT_VERSION"
+        echo "DOCKER_CLIENT_VERSION=$DOCKER_CLIENT_VERSION" >> $GITHUB_ENV
     - name: Update to docker-client snapshot
       run: >
-        mvn -s ../settings.xml -U versions:set-property
+        mvn -s ../settings.xml versions:set-property
         -Dproperty=docker-client.version
-        -DnewVersion=$DOCKER_CLIENT_VERSION
+        -DnewVersion=${{ env.DOCKER_CLIENT_VERSION }}
     - name: Package dockerfile-maven-plugin
-      run: mvn -B -s ../settings.xml package -Dinvoker.skip -DskipTests
+      run: mvn -B -s ../settings.xml package -Dinvoker.skip -DskipTests -U
