@@ -81,3 +81,7 @@ jobs:
         -DnewVersion=$DOCKER_CLIENT_VERSION
     - name: Package dockerfile-maven-plugin
       run: mvn -B -s $GITHUB_WORKSPACE/github-settings.xml package -Dinvoker.skip -DskipTests -U
+    - name: Deploy docker-maven-plugin
+      run: >
+        mvn -B -s $GITHUB_WORKSPACE/settings.xml deploy -Dinvoker.skip -DskipTests
+        -DaltSnapshotDeploymentRepository="$MAVEN_REPOSITORY"
